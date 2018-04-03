@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd">
+
+	<context:annotation-config />
+	<context:component-scan base-package="com.pcg" />
+	<!--<context:property-placeholder location="classpath:config/db.properties, classpath:config/log4j.properties"
+		ignore-unresolvable="true" />--> 
+	<context:property-placeholder location="file:/C:/config/HampshireIndexer/db.properties, file:/C:/config/HampshireIndexer/log4j.properties"
+		ignore-unresolvable="true" />
+	
+	<!-- Microsoft SQL config -->
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${SQL.driverClassName}" />
+		<property name="url" value="${SQL.url}" />
+		<property name="username" value="${SQL.user}" />
+		<property name="password" value="${SQL.password}" />
+	</bean>
+	
+	<bean id="careHomeBeanDAO" class="com.pcg.db.impl.CareHomeBeanDAO">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<bean id="careHomeBeanService" class="com.pcg.db.service.CareHomeBeanImpl" />
+		
+		<!-- property name="scriptFilePath" value="${scriptRootFolderPath}" />  -->
+
+	
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="${SMTP.host}" />
+		<property name="port" value="${SMTP.port}" />
+	</bean>
+	
+	<!-- MailServer Configuration -->
+	<bean id="templateMessage" class="org.springframework.mail.SimpleMailMessage">
+		<property name="from" value="${SMTP.emailFrom}" />
+		<property name="subject" value="${SMTP.emailSubject}" />
+		<property name="to" value="${SMTP.emailTo}" />
+	</bean>
+	
+	<!-- Log4j Configuration -->
+	<bean id="log4jInitializer"
+		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="targetClass" value="org.springframework.util.Log4jConfigurer" />
+		<property name="targetMethod" value="initLogging" />
+		<property name="arguments">
+			<list>
+				<value>file:/C:/config/HampshireIndexer/log4j.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+</beans>
